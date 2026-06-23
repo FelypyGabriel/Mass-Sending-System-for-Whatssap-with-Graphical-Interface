@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code WhatsApp</title>
+</head>
+
+<body style="text-align:center; font-family: Arial;">
+
+  <h2>Escaneie o QR Code</h2>
+
+  <img id="qr" style="width:300px; height:300px; border:1px solid #000;" />
+
+  <p id="status">Carregando QR...</p>
+
+  <script>
+    async function carregarQR() {
+      try {
+        const res = await fetch("/gerar_qr/");
+        const data = await res.json();
+
+        if (data.qr) {
+          document.getElementById("qr").src =
+            "data:image/png;base64," + data.qr;
+
+          document.getElementById("status").innerText =
+            "Aponte o celular para o QR";
+        } else {
+          document.getElementById("status").innerText =
+            "Aguardando QR...";
+        }
+      } catch (e) {
+        document.getElementById("status").innerText =
+          "Erro ao carregar QR";
+      }
+    }
+
+    setInterval(carregarQR, 2000);
+    carregarQR();
+  </script>
+
+</body>
+</html>

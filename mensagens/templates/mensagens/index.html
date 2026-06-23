@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="TalkRush Bot Automation - Automatize suas mensagens com eficiência.">
+    <title>TalkRush - Bot Automation</title>
+    
+    <link rel="stylesheet" href="{% static 'mensagens/main.css' %}" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin+Sketch:wght@400;700&family=Castoro+Titling&family=Cinzel:wght@400..900&family=Kode+Mono:wght@400..700&family=Poiret+One&family=Splash&display=swap" rel="stylesheet">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Cabin+Sketch:wght@400;700&family=Castoro+Titling&family=Cinzel:wght@400..900&family=Kode+Mono:wght@400..700&family=Poiret+One&family=Splash&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/scrollreveal"></script>
+</head>
+
+<body>
+
+    <form style="display:none;">
+        {% csrf_token %}
+    </form>
+
+    <header class="header">
+        <div class="container header-wrapper">
+            <div class="logo">
+                <span class="logo-main">TalkRush</span>
+                <span class="logo-sub">BOT AUTOMATION</span>
+            </div>
+
+<nav class="navbar">
+    <ul class="nav-list">
+        <li><a href="#home">Início</a></li>
+        <li><a href="{% url 'login' %}" class="login-btn">Login</a></li>
+        <li><a href="{% url 'register' %}" class="login-btn">Registro</a></li>
+    </ul>
+</nav>
+            
+            <button class="menu-toggle" aria-label="Abrir menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="container hero-grid">
+                <div class="hero-image-container">
+                    <div class="hero-image-wrapper">
+                        <img src="{% static 'mensagens/Instituto_Federal.png' %}" alt="TalkRush Hero" class="hero-img">
+                        <div class="yellow-stripe"></div>
+                    </div>
+                    <div class="floating-ui ui-1"></div>
+                    <div class="floating-ui ui-2"></div>
+                    <div class="floating-ui ui-3"></div>
+                </div>
+
+                <div class="hero-text">
+                    <h1 class="hero-title">Automação inteligente<br>para comunicação estratégica</h1>
+                    <p class="hero-description">
+                        Sistema base de automação para envio de mensagens em massa no Zapzap
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function getCSRFToken() {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith('csrftoken='))
+                ?.split('=')[1];
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navbar = document.querySelector('.navbar');
+            const overlay = document.createElement('div');
+            overlay.className = 'nav-overlay';
+            document.body.appendChild(overlay);
+
+            menuToggle.addEventListener('click', () => {
+                navbar.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = navbar.classList.contains('active') ? 'hidden' : '';
+            });
+
+            overlay.addEventListener('click', () => {
+                navbar.classList.remove('active');
+                menuToggle.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+
+            const sr = ScrollReveal({
+                origin: 'bottom',
+                distance: '50px',
+                duration: 1000,
+                delay: 200,
+                reset: true
+            });
+
+            sr.reveal('.hero-text', { delay: 100, origin: 'right' });
+            sr.reveal('.hero-image-container', { delay: 100, origin: 'left' });
+            sr.reveal('.section-header', { delay: 200 });
+            sr.reveal('.feature-card', { interval: 200 });
+            sr.reveal('.tech-item', { interval: 150 });
+            sr.reveal('.audience-item', { interval: 100 });
+            sr.reveal('.benefit-item', { interval: 100 });
+            sr.reveal('.btn-whatsapp', { delay: 400, scale: 0.9 });
+            sr.reveal('.contact-form', { delay: 400 });
+        });
+    </script>
+</body>
+</html>

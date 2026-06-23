@@ -1,0 +1,54 @@
+from django.contrib import admin
+from .models import Contato, Grupo, ModeloMensagem, HistoricoEnvio, ConfiguracaoUsuario, VariavelMensagem, Mensagem
+
+@admin.register(Contato)
+class ContatoAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'telefone', 'usuario', 'data_criacao']
+    list_filter = ['usuario', 'data_criacao']
+    search_fields = ['nome', 'telefone']
+    readonly_fields = ['data_criacao']
+
+@admin.register(Grupo)
+class GrupoAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'usuario', 'get_contatos_count', 'data_criacao']
+    list_filter = ['usuario', 'data_criacao']
+    search_fields = ['nome']
+    filter_horizontal = ['contatos']
+    readonly_fields = ['data_criacao']
+
+@admin.register(ModeloMensagem)
+class ModeloMensagemAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'usuario', 'tipo_formatacao', 'data_criacao']
+    list_filter = ['usuario', 'tipo_formatacao', 'data_criacao']
+    search_fields = ['nome', 'conteudo', 'tags']
+    readonly_fields = ['data_criacao', 'data_atualizacao']
+
+@admin.register(HistoricoEnvio)
+class HistoricoEnvioAdmin(admin.ModelAdmin):
+    list_display = ['id', 'usuario', 'status', 'contatos_count', 'get_taxa_sucesso', 'data_criacao']
+    list_filter = ['status', 'usuario', 'data_criacao']
+    search_fields = ['mensagem', 'detalhes_erro']
+    readonly_fields = ['data_criacao', 'data_inicio_envio', 'data_fim_envio']
+    
+    def get_taxa_sucesso(self, obj):
+        return f"{obj.get_taxa_sucesso():.1f}%"
+    get_taxa_sucesso.short_description = 'Taxa de Sucesso'
+
+@admin.register(ConfiguracaoUsuario)
+class ConfiguracaoUsuarioAdmin(admin.ModelAdmin):
+    list_display = ['usuario', 'intervalo_padrao', 'salvar_rascunhos_auto', 'tema_interface']
+    list_filter = ['salvar_rascunhos_auto', 'tema_interface']
+    search_fields = ['usuario__username']
+
+@admin.register(VariavelMensagem)
+class VariavelMensagemAdmin(admin.ModelAdmin):
+    list_display = ['nome', 'descricao', 'exemplo', 'ativa']
+    list_filter = ['ativa']
+    search_fields = ['nome', 'descricao']
+
+# Modelo legado
+@admin.register(Mensagem)
+class MensagemAdmin(admin.ModelAdmin):
+    list_display = ['id', 'usuario', 'enviada_em']
+    list_filter = ['enviada_em']
+    readonly_fields = ['enviada_em']

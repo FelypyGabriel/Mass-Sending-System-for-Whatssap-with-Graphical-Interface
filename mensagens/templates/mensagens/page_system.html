@@ -1,0 +1,226 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sistema de Envio WhatsApp</title>
+
+  <link rel="stylesheet" href="{% static 'mensagens/page_system.css' %}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+</head>
+
+<body>
+
+<main>
+
+  <aside class="sidebar" data-aos="fade-right">
+    
+    <section class="contact-section animate__animated animate__fadeInLeft">
+
+      <h3 class="title_sidebar">Lista de Contatos</h3>
+
+      <form id="form-contato">
+        {% csrf_token %}
+        <input class="input-contato" type="text" id="nome" placeholder="Nome do contato" required />
+        <input class="input-contato" type="tel" id="telefone" placeholder="Telefone" required />
+        <button class="btn btn-contato" type="submit">Adicionar Contato</button>
+      </form>
+
+      <ul class="contact-list" id="lista-contatos">
+        {% for contato in contatos %}
+          <li data-id="{{ contato.id }}">
+            <input type="checkbox" class="contato-checkbox" value="{{ contato.telefone }}">
+            <span>{{ contato.nome }} - {{ contato.telefone }}</span>
+            <button class="btn-excluir-contato">Excluir</button>
+          </li>
+        {% endfor %}
+      </ul>
+
+      <div class="button-group">
+        <button class="btn" id="selecionar-todos">Selecionar Todos</button>
+        <button class="btn" id="desmarcar-todos">Desmarcar Todos</button>
+      </div>
+
+    </section>
+
+  </aside>
+
+  <section class="main-panel animate__animated animate__fadeIn">
+
+    <textarea id="mensagem" placeholder="Digite sua mensagem aqui..."></textarea>
+
+    <button class="btn abrir-whatsapp">
+      Iniciar Envio
+    </button>
+
+    <button class="btn" onclick="window.location.href='{% url 'qr' %}'">
+      Conectar WhatsApp
+    </button>
+
+    <button class="btn" onclick="desconectar()">
+      Desconectar WhatsApp
+    </button>
+
+  </section>
+
+</main>
+
+<footer>
+  <section class="queue-section animate__animated animate__fadeInLeft" style="margin-bottom: 20px;">
+    <h3 class="title_sidebar">Fila de Envios</h3>
+    <div id="queue-status" style="margin-bottom: 12px; font-size: 0.9em;">
+      <p>Status: <span id="queue-active">Inativo</span></p>
+      <p>Mensagens na fila: <span id="queue-count">0</span></p>
+      <p>Sua posição: <span id="queue-position">-</span></p>
+    </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+      <button  class="btn">Importar CSV</button>
+      <button  class="btn">Guia</button>
+    </div>
+  </section>
+
+  <div class="footer-stats">
+    <span id="contact-count">Contatos selecionados: 0</span>
+    <span id="character-count">Caracteres: 0</span>
+
+    <button class="btn" onclick="window.location.href='{% url 'index' %}'">
+      home
+    </button>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  AOS.init();
+
+  const csrfToken = document.querySelector("[name=csrfmiddlewaretoken]").value;
+
+  const lista = document.getElementById("lista-contatos");
+  const mensagem = document.getElementById("mensagem");
+  const iniciarBtn = document.querySelector(".abrir-whatsapp");
+
+  const contador = document.getElementById("contact-count");
+  const caracteres = document.getElementById("character-count");
+
+  function atualizarContador() {
+    const total = document.querySelectorAll(".contato-checkbox:checked").length;
+    contador.innerText = `Contatos selecionados: ${total}`;
+  }
+
+  mensagem.addEventListener("input", () => {
+    caracteres.innerText = `Caracteres: ${mensagem.value.length}`;
+  });
+
+  document.getElementById("selecionar-todos").onclick = () => {
+    document.querySelectorAll(".contato-checkbox").forEach(c => c.checked = true);
+    atualizarContador();
+  };
+
+  document.getElementById("desmarcar-todos").onclick = () => {
+    document.querySelectorAll(".contato-checkbox").forEach(c => c.checked = false);
+    atualizarContador();
+  };
+
+  lista.addEventListener("change", atualizarContador);
+
+  document.getElementById("form-contato").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const nome = document.getElementById("nome").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+
+    if (!nome || !telefone) return alert("Preencha tudo");
+
+    const res = await fetch("{% url 'salvar_contato' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({ nome, telefone })
+    });
+
+    const data = await res.json();
+
+    if (data.status === "ok") {
+      const li = document.createElement("li");
+
+      li.innerHTML = `
+        <input type="checkbox" class="contato-checkbox" value="${telefone}">
+        <span>${nome} - ${telefone}</span>
+        <button class="btn-excluir-contato">Excluir</button>
+      `;
+
+      lista.prepend(li);
+      atualizarContador();
+
+    } else {
+      alert("Erro ao salvar");
+    }
+  });
+
+  lista.addEventListener("click", async e => {
+
+    if (e.target.classList.contains("btn-excluir-contato")) {
+      const li = e.target.closest("li");
+      const id = li.getAttribute("data-id");
+
+      if (!confirm("Excluir?")) return;
+
+      const res = await fetch(`/excluir_contato/${id}/`, {
+        method: "DELETE",
+        headers: { "X-CSRFToken": csrfToken }
+      });
+
+      if (res.ok) {
+        li.remove();
+        atualizarContador();
+      }
+    }
+
+  });
+
+  iniciarBtn.onclick = async () => {
+
+    const msg = mensagem.value.trim();
+    if (!msg) return alert("Digite mensagem");
+
+    const contatos = [...document.querySelectorAll(".contato-checkbox:checked")]
+      .map(c => c.value);
+
+    if (!contatos.length) return alert("Selecione contatos");
+
+    const res = await fetch("{% url 'enviar_view' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken
+      },
+      body: JSON.stringify({ mensagem: msg, contatos })
+    });
+
+    const data = await res.json();
+
+    if (data.status === "ok") {
+      alert("Entrou na fila 🚀");
+    } else {
+      alert("Erro ao enviar");
+    }
+  };
+
+});
+
+function desconectar(){
+  fetch("{% url 'desconectar_whatsapp' %}")
+  .then(r => r.json())
+  .then(d => alert(d.msg));
+}
+</script>
+
+</body>
+</html>

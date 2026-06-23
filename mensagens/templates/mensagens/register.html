@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+  <title>Registro - ffmft bot automation</title>
+ 
+  <link rel="stylesheet" href="{% static 'mensagens/register.css' %}" />
+ 
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="register-container">
+    <form method="post" action="{% url 'register' %}">
+      {% csrf_token %}
+     
+      <h1 class="register-title">Criar Conta</h1>
+     
+      <div class="register-input-box">
+        <input type="text" name="username" placeholder="username" required />
+        <i class='bx bxs-user'></i>
+      </div>
+     
+      <div class="register-input-box">
+        <input type="email" name="email" placeholder="email" required />
+        <i class='bx bxs-envelope'></i>
+      </div>
+     
+      <div class="register-input-box">
+        <input type="password" name="password" placeholder="password" required />
+        <i class='bx bxs-lock-alt'></i>
+      </div>
+     
+      <div class="register-extra">
+        <label>
+          <input type="checkbox" required />
+          aceito os termos
+        </label>
+      </div>
+     
+      <button type="submit" class="register-btn">Registrar</button>
+     
+      <div class="register-login-link">
+        <p>já tem conta? <a href="{% url 'login' %}">login</a></p>
+      </div>
+     
+      {% if messages %}
+        <ul class="register-messages">
+          {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </form>
+  </div>
+</body>
+</html>
