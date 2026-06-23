@@ -1,5 +1,0 @@
-[12584:15808:0616/225617.891:INFO:components\enterprise\browser\controller\chrome_browser_cloud_management_controller.cc:239] No machine level policy manager exists.
-[12584:15808:0616/225621.267:INFO:CONSOLE:238] "Event handler of 'x-storagemutated-1' event must be added on the initial evaluation of worker script.", source: https://static.whatsapp.net/rsrc.php/v4/yY/r/iW577RREKs7.js (238)
-[12584:9604:0616/225625.865:ERROR:google_apis\gcm\engine\registration_request.cc:291] Registration response error message: DEPRECATED_ENDPOINT
-[13060:29264:0616/225641.015:WARNING:net\extras\sqlite\sqlite_persistent_store_backend_base.cc:179] Failed to post task from FlushAndNotifyInBackground@net\extras\sqlite\sqlite_persistent_store_backend_base.cc:229 to client_task_runner_.
-[13060:29264:0616/225641.016:WARNING:net\extras\sqlite\sqlite_persistent_store_backend_base.cc:179] Failed to post task from FlushAndNotifyInBackground@net\extras\sqlite\sqlite_persistent_store_backend_base.cc:229 to client_task_runner_.
